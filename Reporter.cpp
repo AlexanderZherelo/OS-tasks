@@ -60,7 +60,9 @@ int main(int argc, char* argv[]) {
     in.close();
 
     std::sort(list.begin(), list.end(),
-        [](auto const& a, auto const& b) { return a.num < b.num; });
+        [rate](auto const& a, auto const& b) {
+            return (a.hours * rate) > (b.hours * rate);
+        });
 
     std::ofstream out(reportName);
     if (!out) {
