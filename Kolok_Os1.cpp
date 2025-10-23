@@ -19,8 +19,8 @@
 //То есть, чем больше изменений вносится в систему,тем выше вероятность появления ошибок и багов
 //Примеры: 1)правки без рефакторинга; 2) сложные зависимости; 3)много костылей 
 
-//ещё 1 вопрос не отвечен и не сделан пункт 3 задачт
-
+//Закон гласит, что свобода и разнообразие на одном уровне иерархии требуют усиления ограничений на других уровнях, и наоборот
+//Примеры: 1)Архитектура ПО; 2)Система управления доступом 3)Разработка командой
 
 #include <iostream>
 #include <vector>
@@ -48,10 +48,59 @@ bool isPalindrome(const string& s) {
     size_t i = 0, j = s.size() - 1;
     while (i < j) {
         if (s[i] != s[j]) return false;
-        ++i; 
+        ++i;
         --j;
     }
     return true;
+}
+
+struct Node {
+    long long value;
+    Node* next;
+    Node(long long v) : value(v), next(nullptr) {}
+};
+
+void pushBack(Node*& head, Node*& tail, long long v) {
+    Node* node = new Node(v);
+    if (!head) {
+        head = tail = node;
+    }
+    else {
+        tail->next = node;
+        tail = node;
+    }
+}
+
+void printList(Node* head) {
+    Node* cur = head;
+    bool first = true;
+    while (cur) {
+        if (!first) cout << ' ';
+        cout << cur->value;
+        first = false;
+        cur = cur->next;
+    }
+    cout << '\n';
+}
+
+void deleteList(Node* head) {
+    while (head) {
+        Node* tmp = head;
+        head = head->next;
+        delete tmp;
+    }
+}
+
+Node* reverseIterative(Node* head) {
+    Node* prev = nullptr;
+    Node* curr = head;
+    while (curr) {
+        Node* next = curr->next;
+        curr->next = prev;
+        prev = curr;
+        curr = next;
+    }
+    return prev;
 }
 
 int main() {
@@ -59,6 +108,7 @@ int main() {
         cout << "\nChoose operation:\n"
             << "1) Out first n numberf Fib\n"
             << "2) Check if number palindrome\n"
+            << "3) Reverse singly linked list iteratively\n"
             << "0) Exit\n"
             << "Enter number: ";
         int choice;
@@ -87,13 +137,53 @@ int main() {
             cout << '\n';
         }
         else if (choice == 2) {
-            cout << "Enter number";
+            cout << "Enter number: ";
             string s;
             if (!(cin >> s)) {
                 cout << "Incorrect numb\n";
                 continue;
             }
             cout << (isPalindrome(s) ? "YES\n" : "NO\n");
+        }
+        else if (choice == 3) {
+            cout << "Enter number of elements (n >= 0): ";
+            long long n;
+            if (!(cin >> n) || n < 0) {
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                continue;
+            }
+            Node* head = nullptr;
+            Node* tail = nullptr;
+            if (n > 0) {
+                cout << "Enter " << n << " integer values separated by spaces or newlines:\n";
+                for (long long i = 0; i < n; ++i) {
+                    long long v;
+                    if (!(cin >> v)) {
+                        cout << "Incorrect input while reading list\n";
+                        deleteList(head);
+                        head = tail = nullptr;
+                        break;
+                    }
+                    pushBack(head, tail, v);
+                }
+            }
+
+            if (!head && n == 0) {
+                cout << "Input list is empty\n";
+                continue;
+            }
+            if (!head && n > 0) {
+                continue;
+            }
+
+            cout << "Original list:\n";
+            printList(head);
+
+            Node* newHead = reverseIterative(head);
+            cout << "Reversed list:\n";
+            printList(newHead);
+
+            deleteList(newHead);
         }
         else {
             cout << "incorrect choice\n";
