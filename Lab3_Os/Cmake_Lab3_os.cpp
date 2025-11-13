@@ -219,6 +219,6 @@ int main() {
         CloseHandle(hStartEvent);
 
     DeleteCriticalSection(&cs);
-
+    system("pause");
     return 0;
 }
