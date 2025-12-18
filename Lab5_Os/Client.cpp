@@ -27,20 +27,40 @@ int main() {
     cout << "=== Client ===\n";
     const char* pipeName = R"(\\.\pipe\EmpPipe)";
 
-    // Подключаемся к именованному каналу
-    HANDLE hPipe = CreateFileA(
-        pipeName,
-        GENERIC_READ | GENERIC_WRITE,
-        0,
-        NULL,
-        OPEN_EXISTING,
-        0,
-        NULL
-    );
+    // Попытка подключения с повтором, если сервер занят
+    HANDLE hPipe = INVALID_HANDLE_VALUE;
+    for (int attempt = 0; attempt < 5; ++attempt) {
+        hPipe = CreateFileA(
+            pipeName,
+            GENERIC_READ | GENERIC_WRITE,
+            0,
+            NULL,
+            OPEN_EXISTING,
+            0,
+            NULL
+        );
+        if (hPipe != INVALID_HANDLE_VALUE) break;
+
+        DWORD err = GetLastError();
+        if (err == ERROR_PIPE_BUSY) {
+            // подождать пока освободится
+            if (!WaitNamedPipeA(pipeName, 5000)) { // ждём до 5 сек
+                cerr << "All pipe instances are busy, retrying...\n";
+                Sleep(500);
+                continue;
+            }
+        }
+        else {
+            cerr << "Failed to connect to pipe, err=" << err << "\n";
+            return 1;
+        }
+    }
+
     if (hPipe == INVALID_HANDLE_VALUE) {
-        cerr << "Failed to connect to pipe, err=" << GetLastError() << "\n";
+        cerr << "Unable to open pipe after retries.\n";
         return 1;
     }
+
     cout << "Connected to server pipe.\n";
 
     bool running = true;
