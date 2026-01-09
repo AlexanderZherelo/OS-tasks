@@ -275,7 +275,7 @@ int main() {
             continue;
         }
 
-        // Запускаем обработчик в отдельном потоке (минимальное изменение)
+        // Запускаем обработчик в отдельном потоке 
         thread t(ClientHandler, hPipe, ref(employees), ref(locks), filename);
         t.detach();
 
