@@ -1,0 +1,53 @@
+
+POST http://localhost:8080/tasks
+Content-Type: application/json
+
+{
+  "title": "Купить молоко",
+  "description": "Обязательно 3.2% жирности",
+  "status": "todo"
+}
+
+### Создать задачу 2
+POST http://localhost:8080/tasks
+Content-Type: application/json
+
+{
+  "title": "Запустить API",
+  "description": "Проверить эндпоинты",
+  "status": "in_progress"
+}
+
+### Получить все задачи
+GET http://localhost:8080/tasks
+Accept: application/json
+
+### Получить задачу по id 1
+GET http://localhost:8080/tasks/1
+Accept: application/json
+
+### Частичное обновление статуса задачи 2
+PATCH http://localhost:8080/tasks/2
+Content-Type: application/json
+
+{
+  "status": "done"
+}
+
+### Полное обновление задачи 1
+PUT http://localhost:8080/tasks/1
+Content-Type: application/json
+
+{
+  "id": 1,
+  "title": "Купить молоко и хлеб",
+  "description": "Молоко 3.2%, хлеб белый",
+  "status": "in_progress"
+}
+
+### Удалить задачу 1
+DELETE http://localhost:8080/tasks/1
+
+### Проверить список после удаления
+GET http://localhost:8080/tasks
+Accept: application/json
